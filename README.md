@@ -28,6 +28,6 @@ https://www.useloom.com/share/ce41509f71a948c3a7dc96a5cef30d62
   <li>$ node server.js</li>
  </ul>
  
- <p>That's it now you can Access Web Chat http://localhost:8000</p>
+ <p>That's it now you can access Web Chat on http://localhost:8000</p>
  <i>Don't forget change .env with your database info & and also server.js</i>
-<h4>Have fun ~_^</h4>
+<h4><i>Have fun ~_^</i></h4>
