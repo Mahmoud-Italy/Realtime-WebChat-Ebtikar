@@ -1,4 +1,4 @@
-    {!! Form::Open(['id'=>'frmSignup','url'=>'signup','class'=>'hidden']) !!}
+   {!! Form::Open(['id'=>'frmSignup','url'=>'signup','class'=>'hidden']) !!}
         <h2>Signup</h2>
 
           @if(Session::has('error'))
@@ -14,7 +14,7 @@
                 </ul>
             </div>
           @endif
-
+              
           <label>
               <p class="label-txt">NAME</p>
               <input type="text" class="input" name="name">

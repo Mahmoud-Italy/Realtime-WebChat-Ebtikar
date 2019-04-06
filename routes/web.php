@@ -24,5 +24,7 @@ Route::get('signup', function(){ return \App::abort(404); });
 #Verify
 Route::post('verify', 'AppCtrl@doVerify');
 Route::get('verify', function(){ return \App::abort(404); });
+Route::post('userVerify', 'AppCtrl@userVerify');
+Route::get('userVerify', function(){ return \App::abort(404); });
 
 

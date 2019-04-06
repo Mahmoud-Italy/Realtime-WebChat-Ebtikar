@@ -7,6 +7,7 @@ use App;
 use Auth;
 use Session;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use App\User;
 use App\User_logs;
 use App\User_agent;
@@ -35,7 +36,7 @@ class AppCtrl extends Controller
         
         #Check User Access Denied 
         if(self::AccessDenied()) {
-        	Session::flash('warning','You have been Suspend for 5minutes');
+        	Session::flash('warning','Your Account have been Suspend for 5min');
         	return redirect()->back();
         }
 
@@ -53,10 +54,13 @@ class AppCtrl extends Controller
                 $row = User::find($userId);
                 $row->activation_key = time().''.uniqid(md5($email));
                 $row->save();
+                Auth::logout();
 
                 //Send Mail for Verifiy Account
-                Session::flash('verify','');
-                Auth::logout();
+                Mail::send('emails.verify', ['user' => $row], function($message) use($row) {
+                    $message->to($row->email, $row->name)->subject('Verifiy Your Account');
+                 });
+                Session::flash('user_verify','');
                 return redirect()->back();
         	}
         } else {
@@ -82,6 +86,7 @@ class AppCtrl extends Controller
         	$usr->name = $request->input('name');
         	$usr->email = $request->input('email');
         	$usr->password = bcrypt($request->input('password'));
+            $usr->activation_key = time().''.uniqid(md5($usr->name));
         	$usr->save();
 
         	$agent = new User_agent;
@@ -93,16 +98,18 @@ class AppCtrl extends Controller
         	#Commit the roles & Save into DB
             DB::commit();
             
-            #Auto Login after Registeration
-            Auth::login($usr);
-            return redirect()->to('chat-window');
+            #Send Mail for Verifiy Account
+            Mail::send('emails.verify', ['user' => $usr], function($message) use($usr) {
+                $message->to($usr->email, $usr->name)->subject('Verify Your Account');
+             });
+            Session::flash('verification_key','');
+
         } catch (\Exception $e) {
-        	dd($e);
         	#Rollback incase exception at one of them
         	DB::rollback();
         	Session::flash('error','Something went wrong');
-        	return redirect()->back();
         }
+        return redirect()->back();
     }
 
     public function checkUserIP($userId)
@@ -116,13 +123,14 @@ class AppCtrl extends Controller
     	} catch (\Exception $e) { return false; }
     }
 
-    public function userVerifiy(Request $request)
+    public function userVerify(Request $request)
     {
     	try {
     		#Verifiy Activation key
     		$activation_key = $request->input('activation_key');
     		if(User::where('activation_key',$activation_key)->count() == 0) {
     			Session::flash('error','Invalid Activation key');
+                Session::flash('user_verify','');
     			return redirect()->back();
     		} else {
               
@@ -145,8 +153,48 @@ class AppCtrl extends Controller
     	} catch (\Exception $e) {
     		DB::rollback();
     		Session::flash('error','Something went wrong');
+            Session::flash('user_verify','');
     		return redirect()->back();
     	}
+    }
+
+
+
+
+    public function doVerify(Request $request)
+    {
+        try {
+            #Verifiy Activation key
+            $activation_key = $request->input('activation_key');
+            if(User::where('activation_key',$activation_key)->count() == 0) {
+                Session::flash('error','Invalid Activation key');
+                Session::flash('verification_key','');
+                return redirect()->to('/');
+            } else {
+              
+              #Update tables with new recoards
+              DB::beginTransaction();
+              $usr = User::where('activation_key',$activation_key)->first();
+              $usr->email_verified_at = date('Y-m-d H:i:s');
+              $usr->activation_key = NULL;
+              $usr->save();
+
+              $agent = User_agent::where('user_id',$usr->id)->first();
+              $agent->user_agent = $_SERVER['HTTP_USER_AGENT'];
+              $agent->ip_address = $_SERVER['REMOTE_ADDR'];
+              $agent->save();
+              DB::commit();
+
+              #Auto Login after Activated
+              Auth::login($usr);
+              return redirect()->to('chat-window');
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            Session::flash('error','Something went wrong');
+            Session::flash('verification_key','');
+            return redirect()->to('/');
+        }
     }
 
     public function userLogs()

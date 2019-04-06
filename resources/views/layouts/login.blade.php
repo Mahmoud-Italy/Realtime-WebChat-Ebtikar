@@ -6,9 +6,6 @@
           @elseif(Session::has('warning'))
             <p class="alert alert-warning">{{ Session::get('warning') }}</p>
           @endif
-          @if(Session::has('verify'))
-            <p class="alert alert-warning">Verify</p>
-          @endif
 
           @if($errors->any())
             <div class="alert alert-danger">

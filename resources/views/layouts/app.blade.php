@@ -8,8 +8,14 @@
 <body>
 
   <div class="container">
-     @include('layouts.login')
-     @include('layouts.signup')
+    @if(Session::has('verification_key'))
+        @include('layouts.verify')
+    @elseif(Session::has('user_verify'))
+        @include('layouts.userVerify')
+    @else
+       @include('layouts.login')
+       @include('layouts.signup')
+    @endif
   </div>
 
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
