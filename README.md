@@ -1,6 +1,6 @@
 # Realtime WebChat Ebtikar
 
-<p>this repoistory introduce to your web chat realtime using Nodejs, Socket.io  PHP Frame Work Laravel</p>
+<p>this repository for introduce web chat Real time using Nodejs, Socket.io, PHP Framework Laravel</p>
 
 <h4>Demo:</h4>
 https://www.useloom.com/share/ce41509f71a948c3a7dc96a5cef30d62
