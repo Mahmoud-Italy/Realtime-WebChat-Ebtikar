@@ -19,6 +19,8 @@ https://www.useloom.com/share/ce41509f71a948c3a7dc96a5cef30d62
   <li>$ git clone https://github.com/Mahmoud-Italy/Realtime-WebChat-Ebtikar</li>
   <li>$ cd Realtime-WebChat-Ebtikar</i>
   <li>$ npm install</li>
+  <li>$ npm install socket.io</li>
+  <li>$ npm install socket.io mysql</li>
   <li>$ Composer update</li>
   <li>$ php artisan serve</li>
   <li>$ cd public/socket.io</li>
